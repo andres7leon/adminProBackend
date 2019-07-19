@@ -1,10 +1,20 @@
 // Requires 
 const express = require('express');
 const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
 
 //inicializar variables
 const app = express();
 
+/* ------------------------------- body parse ------------------------------- */
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+/* ----------------------------- importar rutas ----------------------------- */
+
+let appRoutes = require('./routes/app');
+let usuarioRoutes = require('./routes/usuario');
 
 mongoose.connect('mongodb://localhost:27017/hospitalDB', { useNewUrlParser: true }, (err, res) => {
 
@@ -13,17 +23,10 @@ mongoose.connect('mongodb://localhost:27017/hospitalDB', { useNewUrlParser: true
     console.log("base de datos conectada 2");
 });
 
+/* ---------------------------------- rutas --------------------------------- */
 
-//rutas
-
-app.get('/', (req, res, next) => {
-
-    res.status(200).json({
-        ok: true
-    });
-
-});
-
+app.use('/', appRoutes);
+app.use('/usuario', usuarioRoutes)
 
 //Escuchar Express
 
