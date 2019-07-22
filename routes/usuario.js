@@ -1,7 +1,10 @@
 const express = require('express');
-const bcrypt = require('bcryptjs')
-
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const mdAutenticacion = require('../middlewares/autenticacion');
 const app = express();
+
+
 
 const Usuario = require('../models/usuario');
 
@@ -35,7 +38,7 @@ app.get('/', (req, res, next) => {
 /*                             actualizar usuario                             */
 /* -------------------------------------------------------------------------- */
 
-app.put('/:id', (req, res) => {
+app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 
     let id = req.params.id;
     let body = req.body;
@@ -78,7 +81,8 @@ app.put('/:id', (req, res) => {
 
             res.status(200).json({
                 ok: true,
-                data: usuarioGuardado
+                data: usuarioGuardado,
+                dataToken: req.usuario
             })
 
         });
@@ -92,7 +96,7 @@ app.put('/:id', (req, res) => {
 /*                              crear un usuario                              */
 /* -------------------------------------------------------------------------- */
 
-app.post('/', (req, res) => {
+app.post('/', mdAutenticacion.verificaToken, (req, res) => {
 
     let body = req.body;
 
@@ -126,6 +130,43 @@ app.post('/', (req, res) => {
 });
 
 
+/* -------------------------------------------------------------------------- */
+/*                         Eliminar usuario por el id                         */
+/* -------------------------------------------------------------------------- */
+
+app.delete('/:id', mdAutenticacion.verificaToken, (req, res) => {
+
+    let id = req.params.id;
+
+    Usuario.findByIdAndRemove(id, (err, data) => {
+
+        if (err) {
+
+            return res.status(500).json({
+                ok: false,
+                err
+            })
+
+        }
+
+        if (!data) {
+
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'No existe ningun usuario con ese ID',
+                err: { mensaje: 'No existe ningun usuario con ese ID', }
+            })
+
+        }
+
+        res.status(200).json({
+            ok: true,
+            data
+        })
+
+    });
+
+});
 
 
 module.exports = app;

@@ -15,6 +15,7 @@ app.use(bodyParser.json());
 
 let appRoutes = require('./routes/app');
 let usuarioRoutes = require('./routes/usuario');
+let loginRoutes = require('./routes/login');
 
 mongoose.connect('mongodb://localhost:27017/hospitalDB', { useNewUrlParser: true }, (err, res) => {
 
@@ -27,6 +28,7 @@ mongoose.connect('mongodb://localhost:27017/hospitalDB', { useNewUrlParser: true
 
 app.use('/', appRoutes);
 app.use('/usuario', usuarioRoutes)
+app.use('/login', loginRoutes)
 
 //Escuchar Express
 
