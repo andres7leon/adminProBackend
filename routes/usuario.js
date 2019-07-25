@@ -14,8 +14,12 @@ const Usuario = require('../models/usuario');
 
 app.get('/', (req, res, next) => {
 
+    let desde = req.query.desde || 0;
+    desde = Number(desde);
 
-    Usuario.find({}, 'nombre')
+    Usuario.find({}, 'nombre email')
+        .skip(desde)
+        .limit(5)
         .exec((err, data) => {
 
             if (err) {
@@ -25,9 +29,12 @@ app.get('/', (req, res, next) => {
                 })
             }
 
-            res.json({
-                ok: true,
-                data
+            Usuario.count({}, (err, conteo) => {
+                res.json({
+                    ok: true,
+                    data,
+                    total: conteo
+                })
             })
 
         })
